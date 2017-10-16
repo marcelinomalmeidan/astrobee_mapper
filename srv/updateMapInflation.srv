@@ -1,0 +1,4 @@
+bool inflateMap
+float64 inflateRadius
+---
+bool success
