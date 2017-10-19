@@ -9,6 +9,9 @@ void *fadeTask(void *threadID);
 //Thread for constantly updating the tfTree values
 void *tfTask(void *threadID);
 
+//Thread for collision checking 
+void *collisionCheckTask(void *threadID);
+
 //Thread for publishing tfTree (used when loading real data without tf data)
 void *tfPub(void *threadID);
 

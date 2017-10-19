@@ -7,6 +7,10 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <tf/transform_broadcaster.h>
 
+//Astrobee message types
+#include "astrobee_mapper/ControlGoal.h"
+#include "astrobee_mapper/ControlState.h"
+
 //My defined libraries
 #include "tf_class.h"
 #include "octoClass.h"
@@ -15,7 +19,9 @@
 #include "HelperFcns/QuatRotEuler.h"
 #include "Services/services.h"
 #include "threads/threads.h"
-#include "Callbacks/callbacks.h"
+#include "polynomials.h"
+#include "sampledTrajectory.h"
+#include "Callbacks/callbacks.h" 
 
 //Declare global variables (structures defined in structs.h)
 extern mutexStruct mutexes;		

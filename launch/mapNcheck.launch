@@ -1,0 +1,30 @@
+<launch>
+  <node pkg="astrobee_mapper"
+    type="astrobee_mapNcheck"
+    name="astrobee_mapper"
+    output="screen">
+
+    <param name="use_sim_time" value="true" />
+
+    <!-- Set parameters for the mapper -->
+    <param name="mapResolution" value="0.1"/>   <!-- meters -->
+    <param name="maxRange" value="4"/>          <!-- meters -->
+    <param name="minRange" value="0.20"/>       <!-- meters -->
+
+    <!-- Time to forget information (set as negative if infinity) -->
+    <param name="memoryTime" value="-30.0"/>     <!-- seconds -->
+
+    <!-- Map inflation parameters -->
+    <param name="inflateMap" value="true"/>     <!-- true/false -->
+    <param name="inflateRadius" value="0.25"/>  <!-- meters -->
+
+    <!-- Publish tf tree (for reading bag data) -->
+    <param name="pubTf" value="false"/>         <!-- true/false -->
+
+    <!-- Trajectory related parameters -->    
+    <param name="trajResolution"    value="0.02"/> <!-- meters -->
+    <param name="compressionMaxDev" value="0.01"/> <!-- meters -->
+
+
+  </node>
+</launch>

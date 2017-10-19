@@ -78,6 +78,13 @@ void drawCollidingNodes(const std::set<Eigen::Vector3d, vec3_compare> PointSet,
   drawNodes(PointSet, frame_id, "collision", resolution, Color::Red(), 0.9, marker_array);
 }
 
+void drawCollidingNodes(const std::vector<octomap::point3d> Points, 
+                        const std::string& frame_id,
+                        const double resolution,
+                        visualization_msgs::MarkerArray* marker_array){
+  drawNodes(Points, frame_id, "collision", resolution, Color::Red(), 0.9, marker_array);
+}
+
 void drawNodes(const std::vector<Eigen::Vector3d> Points, 
                const std::string& frame_id,
                const std::string& ns, //namespace
@@ -124,7 +131,6 @@ void drawNodes(const std::vector<Eigen::Vector3d> Points,
                                 marker_array);
 }
 
-
 void drawNodes(const std::set<Eigen::Vector3d, vec3_compare> PointSet, 
                const std::string& frame_id,
                const std::string& ns, //namespace
@@ -160,6 +166,52 @@ void drawNodes(const std::set<Eigen::Vector3d, vec3_compare> PointSet,
     NewPoint.x = CurPoint(0);
     NewPoint.y = CurPoint(1);
     NewPoint.z = CurPoint(2);
+    marker.points.push_back(NewPoint);
+    // marker.pose.position = NewPoint;
+    // marker_array->markers.push_back(marker);
+    // i = i + 1;
+  }
+  marker_array->markers.push_back(marker);
+
+  std_msgs::Header header;
+  header.frame_id = frame_id;
+  header.stamp = ros::Time::now();
+  setMarkerProperties(header, 0.0, visualization_msgs::Marker::ADD,
+                                marker_array);
+}
+
+void drawNodes(const std::vector<octomap::point3d> Points, 
+               const std::string& frame_id,
+               const std::string& ns, //namespace
+               const double resolution,
+               const std_msgs::ColorRGBA color,
+               const double transparency, //0 -> transparent, 1 -> opaque
+               visualization_msgs::MarkerArray* marker_array){
+  marker_array->markers.clear();
+
+  visualization_msgs::Marker marker;
+  marker.type = visualization_msgs::Marker::CUBE_LIST;
+  marker.action = visualization_msgs::Marker::ADD;
+  marker.color = color;
+  marker.color.a = transparency;
+  marker.scale.x = resolution;
+  marker.scale.y = resolution;
+  marker.scale.z = resolution;
+  marker.ns = ns;
+  marker.header.frame_id = frame_id;
+  marker.header.stamp = ros::Time::now();
+  marker.pose.orientation.w = 1.0;
+  marker.header.seq = 0;
+  marker.id = 0;
+
+  //Get the number of requested waypoints
+  int n_w = Points.size();
+
+  for (size_t i = 0; i < n_w; ++i){
+    geometry_msgs::Point NewPoint;
+    NewPoint.x = Points[i].x();
+    NewPoint.y = Points[i].y();
+    NewPoint.z = Points[i].z();
     marker.points.push_back(NewPoint);
     // marker.pose.position = NewPoint;
     // marker_array->markers.push_back(marker);

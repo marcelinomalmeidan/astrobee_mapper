@@ -71,3 +71,61 @@ void pclCallback(const sensor_msgs::PointCloud2::ConstPtr &msg){
 	ROS_INFO("Mapping time: %f", mapTime.toSec());
 
 }
+
+
+void segmentCallback(const astrobee_mapper::ControlGoal::ConstPtr &msg){
+	
+	ros::Time t0 = ros::Time::now();
+	while(t0.toSec() == 0){
+		t0 = ros::Time::now();
+	}
+ 
+ 	//Get segments
+    astrobee_mapper::ControlGoal segments = *msg;
+
+	//Transform message into set of polynomials
+    trajectory_3D polyTrajectories(segments);
+
+    //Get a fake trajectory
+	std::vector<double> Time;
+	pcl::PointCloud<pcl::PointXYZ> Positions; 
+	pcl::PointXYZ Pos;
+	double rx = 3, ry = 2, rz = 0;
+	for (int i = 0; i < 100; i++){
+		double time = 2*M_PI*float(i)/(100.0*4.0);
+		Time.push_back(time);
+		Pos = pcl::PointXYZ(rx*sin(time), ry*(cos(time)-1.0), rz*sin(time));
+		Positions.push_back(Pos);
+	}
+
+    //Sample trajectory at 10hz
+	sampledTrajectory3D sampledTraj(0.1, polyTrajectories);
+	// sampledTrajectory3D sampledTraj(Time, Positions); //Fake trajectory
+	
+	pthread_mutex_lock(&mutexes.sampledTraj);
+		globals.sampledTraj.Pos = sampledTraj.Pos;
+		globals.sampledTraj.Time = sampledTraj.Time;
+		globals.sampledTraj.nPoints = sampledTraj.nPoints;
+
+		//Compress trajectory into points with max deviation of 1cm from original trajectory
+		globals.sampledTraj.compressSamples();
+
+		//  Transform compressed trajectory into a set of pixels in octomap
+		//  Octomap insertion avoids repeated points
+		globals.sampledTraj.ThickTraj.clear();
+		for(int i = 0; i < globals.sampledTraj.compressedPoints-1; i++){
+			globals.sampledTraj.thickBresenham(globals.sampledTraj.compressedPos[i], 
+								       		   globals.sampledTraj.compressedPos[i+1]); 
+		}
+
+		//Populate trajectory node centers in a point cloud
+		globals.sampledTraj.thickTrajToPcl();
+
+		//Populate kdtree for finding nearest neighbor w.r.t. collisions
+		globals.sampledTraj.createKdTree();
+	pthread_mutex_unlock(&mutexes.sampledTraj);	
+
+	ros::Duration SolverTime = ros::Time::now() - t0;
+	ROS_INFO("Time to compute octotraj: %f", SolverTime.toSec());
+
+} 

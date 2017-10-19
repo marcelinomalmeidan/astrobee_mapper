@@ -4,6 +4,8 @@
 
 #include <visualization_msgs/MarkerArray.h>
 #include <eigen_conversions/eigen_msg.h>
+#include <octomap/octomap.h>
+#include <octomap/OcTree.h>
 #include "compareVec3.h"
 
 
@@ -73,6 +75,11 @@ void drawCollidingNodes(const std::set<Eigen::Vector3d, vec3_compare> PointSet,
                         const double resolution,
                         visualization_msgs::MarkerArray* marker_array);
 
+void drawCollidingNodes(const std::vector<octomap::point3d> Points, 
+                        const std::string& frame_id,
+                        const double resolution,
+                        visualization_msgs::MarkerArray* marker_array);
+
 void drawNodes(const std::vector<Eigen::Vector3d> Points, 
                const std::string& frame_id,
                const std::string& ns, //namespace
@@ -82,6 +89,14 @@ void drawNodes(const std::vector<Eigen::Vector3d> Points,
                visualization_msgs::MarkerArray* marker_array);
 
 void drawNodes(const std::set<Eigen::Vector3d, vec3_compare> PointSet, 
+               const std::string& frame_id,
+               const std::string& ns, //namespace
+               const double resolution,
+               const std_msgs::ColorRGBA color,
+               const double transparency, //0 -> transparent, 1 -> opaque
+               visualization_msgs::MarkerArray* marker_array);
+
+void drawNodes(const std::vector<octomap::point3d> Points, 
                const std::string& frame_id,
                const std::string& ns, //namespace
                const double resolution,

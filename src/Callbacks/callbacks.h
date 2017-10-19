@@ -3,7 +3,10 @@
 
 #include "globals.h"
 
-//Thread for handling incoming point cloud messages
+//Callback for handling incoming point cloud messages
 void pclCallback(const sensor_msgs::PointCloud2::ConstPtr &msg);
+
+//Callback for handling incoming new trajectory messages
+void segmentCallback(const astrobee_mapper::ControlGoal::ConstPtr &msg);
 
 #endif

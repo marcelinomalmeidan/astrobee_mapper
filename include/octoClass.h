@@ -49,6 +49,10 @@ public:
 								 const tf::StampedTransform &tf_cam2world);	//Map obstacles and free area
 	void fadeMemory(const double &rate);	//Rate at which this function is being called
 	void inflateObstacles(const double &thickness);
+	void findCollidingNodesTree(const pcl::PointCloud< pcl::PointXYZ > &PointCloud,
+		                        std::vector<octomap::point3d> &collidingNodes);
+	void findCollidingNodesInflated(const pcl::PointCloud< pcl::PointXYZ > &PointCloud,
+		                            std::vector<octomap::point3d> &collidingNodes);
 	void occupiedVisMarkers(visualization_msgs::MarkerArray* marker_array);
 	void inflatedOccVisMarkers(visualization_msgs::MarkerArray* marker_array);
 	void freeVisMarkers(visualization_msgs::MarkerArray* marker_array);

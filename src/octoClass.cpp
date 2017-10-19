@@ -365,6 +365,67 @@ void OctoClass::inflateObstacles(const double &thickness){
 
 }
 
+void OctoClass::findCollidingNodesTree(const pcl::PointCloud< pcl::PointXYZ > &PointCloud,
+		                               std::vector<octomap::point3d> &collidingNodes){
+	static octomap::point3d query, nodeCenter;
+	static octomap::OcTreeNode* node;
+	static octomap::OcTreeKey key;
+	octomap::KeySet endpoints;
+
+	const int cloudsize = PointCloud.size();
+
+	for (int j=0; j < cloudsize; j++){
+		query = octomap::point3d(PointCloud.points[j].x, 
+			     		         PointCloud.points[j].y, 
+			                     PointCloud.points[j].z);
+		key = tree.coordToKey(query);
+		std::pair<octomap::KeySet::iterator,bool> ret = endpoints.insert(key);
+		
+		//Check if current node has not been evaluated yet
+		if (ret.second){ // insertion took place => new node being evaluated
+			node = tree.search(query);
+			if(node == NULL){
+				continue;
+			}
+			else if(tree.isNodeOccupied(node)){
+				nodeCenter = tree.keyToCoord(key);
+				collidingNodes.push_back(nodeCenter);
+
+			}
+		}
+	}
+}
+
+void OctoClass::findCollidingNodesInflated(const pcl::PointCloud< pcl::PointXYZ > &PointCloud,
+		                                   std::vector<octomap::point3d> &collidingNodes){
+	static octomap::point3d query, nodeCenter;
+	static octomap::OcTreeNode* node;
+	static octomap::OcTreeKey key;
+	octomap::KeySet endpoints;
+
+	const int cloudsize = PointCloud.size();
+
+	for (int j=0; j < cloudsize; j++){
+		query = octomap::point3d(PointCloud.points[j].x, 
+			     		         PointCloud.points[j].y, 
+			                     PointCloud.points[j].z);
+		key = treeInflated.coordToKey(query);
+		std::pair<octomap::KeySet::iterator,bool> ret = endpoints.insert(key);
+		
+		//Check if current node has not been evaluated yet
+		if (ret.second){ // insertion took place => new node being evaluated
+			node = treeInflated.search(query);
+			if(node == NULL){
+				continue;
+			}
+			else if(treeInflated.isNodeOccupied(node)){
+				nodeCenter = treeInflated.keyToCoord(key);
+				collidingNodes.push_back(nodeCenter);
+
+			}
+		}
+	}
+}
 
 //Adapted from https://github.com/OctoMap/octomap_mapping
 void OctoClass::occupiedVisMarkers(visualization_msgs::MarkerArray* occupiedNodesVis){	//Publish occupied nodes

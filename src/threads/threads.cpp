@@ -71,6 +71,101 @@ void *tfTask(void *threadID){
 	pthread_exit(NULL);
 }
 
+void *collisionCheckTask(void *threadID){
+	ROS_INFO("collisionCheck Thread started!");
+
+	//Rate at which the collision checker will run
+	ros::Rate loop_rate(1);
+
+	//visualization markers
+	visualization_msgs::MarkerArray TrajMarkers, samples, compressedSamples;
+
+	//pcl variables
+	int cloudsize;
+
+	while (ros::ok()){
+
+		//Get time for when this task started
+		ros::Time t0 = ros::Time::now();
+
+		//Copy trajectory into local point cloud
+		pcl::PointCloud< pcl::PointXYZ > PointCloudTraj;
+		pthread_mutex_lock(&mutexes.sampledTraj);
+			PointCloudTraj = globals.sampledTraj.PointCloudTraj;
+
+			//Send visualization markers
+			globals.sampledTraj.trajVisMarkers(&TrajMarkers);
+			globals.sampledTraj.samplesVisMarkers(&samples);
+			globals.sampledTraj.compressedVisMarkers(&compressedSamples);
+			globals.pathMarker_pub.publish(TrajMarkers); 
+			globals.pathMarker_pub.publish(samples); 
+			globals.pathMarker_pub.publish(compressedSamples); 
+		pthread_mutex_unlock(&mutexes.sampledTraj);	
+
+
+		//Stop execution if there are no points in the trajectory structure
+		cloudsize = PointCloudTraj.size();
+		if(cloudsize <= 0){
+			loop_rate.sleep();
+			continue;
+		}
+
+		//Check if trajectory collides with points in the point-cloud
+		std::vector<octomap::point3d> collidingNodes;
+		pthread_mutex_lock(&mutexes.obsTree);
+			static double res = globals.obsTree.treeInflated.getResolution();
+			if(globals.obsTree.inflateMap){
+				globals.obsTree.findCollidingNodesInflated(PointCloudTraj, collidingNodes);
+			}
+			else{
+				globals.obsTree.findCollidingNodesTree(PointCloudTraj, collidingNodes);	
+			}
+		pthread_mutex_unlock(&mutexes.obsTree);
+
+		if(collidingNodes.size() > 0){
+			//Sort collision time (use kdtree for nearest neighbor)
+			std::vector<geometry_msgs::PointStamped> sortedCollisions;
+			pthread_mutex_lock(&mutexes.sampledTraj);
+				globals.sampledTraj.sortCollisions(collidingNodes,sortedCollisions);
+			pthread_mutex_unlock(&mutexes.sampledTraj);	
+
+			// ROS_INFO("Imminent collision at Pos (%.2f,%.2f,%.2f) - Time: %.3f", 
+			// 			        sortedCollisions[0].point.x, 
+			// 			        sortedCollisions[0].point.y, 
+			// 			        sortedCollisions[0].point.z, 
+			double collisionTime = (sortedCollisions[0].header.stamp - ros::Time::now()).toSec();
+			if(collisionTime > 0){
+				ROS_INFO("Imminent collision within %.3f seconds!",collisionTime);	
+			}
+			
+		}
+
+		//Draw colliding markers (delete if none)
+	    drawCollidingNodes(collidingNodes, "world", 1.01*res, &TrajMarkers);
+	    globals.pathMarker_pub.publish(TrajMarkers); //Add new
+
+
+		// for(int i = 0; i < sortedCollisions.size(); i++){
+		// 	std::cout << "    "  << sortedCollisions[i].point.x 
+		//                 << " " << sortedCollisions[i].point.y
+		//                 << " " << sortedCollisions[i].point.z
+		//                 << " (time: " << sortedCollisions[i].header.stamp.toSec() << ")" << std::endl;
+		// }
+
+		ros::Duration SolverTime = ros::Time::now() - t0;
+		ROS_INFO("Collision check time: %f", SolverTime.toSec());
+		
+		loop_rate.sleep();
+	}
+
+	ROS_INFO("Exiting collisionCheck Thread...");
+
+	pthread_mutex_lock(&mutexes.threadCount);
+        globals.threadCount -= 1;
+    pthread_mutex_unlock(&mutexes.threadCount);
+	pthread_exit(NULL);
+} 
+
 //Thread for publishing tfTree (used when loading real data without tf data)
 void *tfPub(void *threadID){
 	static tf::TransformBroadcaster br;
