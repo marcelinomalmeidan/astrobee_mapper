@@ -107,6 +107,7 @@ int main(int argc, char **argv) {
 	globals.obstacleMarker_pub = n.advertise<visualization_msgs::MarkerArray>("Obstacle_markers", 1000);
 	globals.freeSpaceMarker_pub = n.advertise<visualization_msgs::MarkerArray>("FreeSpace_markers", 1000);
 	globals.inflatedObstacleMarker_pub = n.advertise<visualization_msgs::MarkerArray>("InflatedObstacle_markers", 1000);
+	globals.inflatedFreeSpaceMarker_pub = n.advertise<visualization_msgs::MarkerArray>("InflatedFreeSpace_markers", 1000);
 	globals.pathMarker_pub = n.advertise<visualization_msgs::MarkerArray>("path_markers", 1000);
 
 	ros::spin();

@@ -27,6 +27,7 @@ struct globalVariables{
 	ros::Publisher obstacleMarker_pub;
 	ros::Publisher freeSpaceMarker_pub;
 	ros::Publisher inflatedObstacleMarker_pub;
+	ros::Publisher inflatedFreeSpaceMarker_pub;
 	ros::Publisher pathMarker_pub;
 
 	

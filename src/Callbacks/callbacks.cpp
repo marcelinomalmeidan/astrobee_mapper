@@ -65,6 +65,14 @@ void pclCallback(const sensor_msgs::PointCloud2::ConstPtr &msg){
 		pthread_mutex_unlock(&mutexes.obsTree);
 		globals.inflatedObstacleMarker_pub.publish(inflatedMarkers);
 	}
+
+	if(globals.inflatedFreeSpaceMarker_pub.getNumSubscribers() > 0){
+		visualization_msgs::MarkerArray inflatedFreeMarkers;
+		pthread_mutex_lock(&mutexes.obsTree);
+			globals.obsTree.inflatedFreeVisMarkers(&inflatedFreeMarkers);
+		pthread_mutex_unlock(&mutexes.obsTree);
+		globals.inflatedFreeSpaceMarker_pub.publish(inflatedFreeMarkers);
+	}
 	
 
 	ros::Duration mapTime = ros::Time::now() - t0;
