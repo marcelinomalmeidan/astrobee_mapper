@@ -4,8 +4,8 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <complex>
-#include "astrobee_mapper/ControlGoal.h"
-#include "astrobee_mapper/ControlState.h"
+#include "ff_msgs/ControlGoal.h"
+#include "ff_msgs/ControlState.h"
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -53,7 +53,7 @@ public:
 	//Constructor: define a polynomial from a "ControlState" msg type (2nd order polynomials only)
 	poly_3D(const double t0_in, 
 		    const double tf_in, 
-		    const astrobee_mapper::ControlState segment);
+		    const ff_msgs::ControlState segment);
 	poly_3D();
 
 	//Methods
@@ -74,7 +74,7 @@ public:
 	int nSegments;
 
 	//Constructor
-	trajectory_3D(const astrobee_mapper::ControlGoal segments);
+	trajectory_3D(const ff_msgs::ControlGoal segments);
 	
 	//Methods
 	void printTrajCoeff();							//Print coefficients from all segments

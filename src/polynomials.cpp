@@ -187,7 +187,7 @@ std::vector<std::complex<double>> polynomial::roots3rdOrderPoly(){
 //Constructor: define a polynomial from a "ControlState" msg type (2nd order polynomials only)
 poly_3D::poly_3D(const double t0_in, 
 	             const double tf_in, 
-	             const astrobee_mapper::ControlState segment){
+	             const ff_msgs::ControlState segment){
 	int n_coeff = 3;
 	polyX.coeff.resize(n_coeff);
 	polyY.coeff.resize(n_coeff);
@@ -254,7 +254,7 @@ void poly_3D::segmentAtTime(const double time,
 	result.z = z;
 }
 
-trajectory_3D::trajectory_3D(const astrobee_mapper::ControlGoal segments){
+trajectory_3D::trajectory_3D(const ff_msgs::ControlGoal segments){
 	nSegments = segments.segment.size() - 1;
 	ros::Time t0_segment;
 	ros::Time tf_segment;

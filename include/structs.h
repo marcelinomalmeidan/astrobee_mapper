@@ -11,7 +11,7 @@
 #include "octoClass.h"
 
 //Astrobee message types
-#include "astrobee_mapper/ControlGoal.h"
+#include "ff_msgs/ControlGoal.h"
 #include "sampledTrajectory.h"
 
 

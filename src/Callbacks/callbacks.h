@@ -7,6 +7,6 @@
 void pclCallback(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
 //Callback for handling incoming new trajectory messages
-void segmentCallback(const astrobee_mapper::ControlGoal::ConstPtr &msg);
+void segmentCallback(const ff_msgs::ControlGoal::ConstPtr &msg);
 
 #endif

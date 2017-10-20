@@ -21,4 +21,5 @@
 uint8 mode                                  # STOP, IDLE, NOMINAL
 string flight_mode                          # Flight mode
 bool faceforward                            # Are we in faceforward mode?
-astrobee_mapper/ControlState[] segment              # Segment
+ff_msgs/ControlState[] segment              # Segment
+ 

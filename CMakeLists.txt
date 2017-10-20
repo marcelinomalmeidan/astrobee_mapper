@@ -41,10 +41,10 @@ add_service_files( FILES
   voidService.srv
 )
 
-add_message_files(DIRECTORY msg FILES
-   ControlState.msg
-   ControlGoal.msg
- )
+# add_message_files(DIRECTORY msg FILES
+#    ControlState.msg
+#    ControlGoal.msg
+#  )
 
 generate_messages( DEPENDENCIES
    std_msgs
@@ -62,6 +62,7 @@ generate_messages( DEPENDENCIES
 catkin_package(
   DEPENDS Eigen
   CATKIN_DEPENDS message_runtime
+  ff_msgs
 )
 
 ###########

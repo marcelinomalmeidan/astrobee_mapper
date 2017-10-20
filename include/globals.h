@@ -8,8 +8,8 @@
 #include <tf/transform_broadcaster.h>
 
 //Astrobee message types
-#include "astrobee_mapper/ControlGoal.h"
-#include "astrobee_mapper/ControlState.h"
+#include "ff_msgs/ControlGoal.h"
+#include "ff_msgs/ControlState.h"
 
 //My defined libraries
 #include "tf_class.h"

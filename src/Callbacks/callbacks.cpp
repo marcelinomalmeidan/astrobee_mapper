@@ -81,7 +81,7 @@ void pclCallback(const sensor_msgs::PointCloud2::ConstPtr &msg){
 }
 
 
-void segmentCallback(const astrobee_mapper::ControlGoal::ConstPtr &msg){
+void segmentCallback(const ff_msgs::ControlGoal::ConstPtr &msg){
 	
 	ros::Time t0 = ros::Time::now();
 	while(t0.toSec() == 0){
@@ -89,7 +89,7 @@ void segmentCallback(const astrobee_mapper::ControlGoal::ConstPtr &msg){
 	}
  
  	//Get segments
-    astrobee_mapper::ControlGoal segments = *msg;
+    ff_msgs::ControlGoal segments = *msg;
 
 	//Transform message into set of polynomials
     trajectory_3D polyTrajectories(segments);
