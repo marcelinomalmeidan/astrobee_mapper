@@ -4,7 +4,7 @@ The \ref mapper node is responsible for maintaining a representation of the envi
 
 Observation: as of now, transformation of a map to free-space polygons is not yet implemented.
 
-The mapper node can be divided in the following tasks:
+The \ref mapper node can be divided in the following tasks:
 
 * `Trajectory Validator` - Validates planned trajectories based on keep-in and keep-out zones.
 * `Octomapper` - Maps Astrobee's surroundings using an octomap (octree-based map);
@@ -48,7 +48,7 @@ The \ref mapper node publishes [visualization_msgs::MarkerArrays](http://docs.ro
 
 ## Octomapper
 
-The Octomapper portion of the \ref mapper creates a 3D occupancy map of the environment that maps known areas probabilistically. The Octomapperr builds a representation of the environment (clutter topology) using measurements from the \ref picoflexx depth sensor, using an Octomap. Mapping is done in the world frame, and the TF2 library is used to transform from the sensor frame to the world frame based on dynamic transforms published by the EKF, and static transforms published by \ref framestore.
+The Octomapper portion of the \ref mapper creates a 3D occupancy map of the environment that maps known areas probabilistically. The Octomapper builds a representation of the environment (clutter topology) using measurements from the \ref picoflexx depth sensor. Mapping is done in the world frame, and the TF2 library is used to transform from the sensor frame to the world frame based on dynamic transforms published by the EKF, and static transforms published by \ref framestore.
 It is based on the following work:
 
 ```
@@ -85,7 +85,7 @@ the point cloud data from camera frame to world frame. This is done by threads t
 
 The Octomapper publishes ROS visualization_markers, which can be used for human visual inspection of the map using RVIZ.
 It should be mentioned that these visualization_markers are only published if there is a subscriber to it. Hence, if nobody
-requests to see this in RVIZ, this won't be published. The importance of this is to avoid high-bandwidth information being
+requests to see them in RVIZ, it won't be published. The importance of this is to avoid high-bandwidth information being
 sent across the network. Map visualization can be seen through the topics:
 
 * `mapper/obstacle_markers` - Visualization of the occupied voxels in the non-inflated map.
@@ -110,3 +110,13 @@ The Octomapper takes the following paramers as inputs (defined in mapper.config)
 * `clamping_threshold_max` - Maximum probability assigned as occupancy for a node. This should not be set to 1, due to the considerations above.
 
 ## Sentinel
+
+As its name suggests, the responsibility of the Sentinel is to look out for the safety of the platform. Unlike the \ref planner, which depends on map-building to proactively plan a safe path through a representation of the world, the sentinel node reacts to sensed data to check if the platform is likely to collide with an obstacle over some fixed time horizon, based on the segment is it currently following.
+
+![alt text](../images/mobility/sentinel.png "Collision avoidance")
+
+The sentinel is activated when a new trajectory is published in `gnc/ctl/segment`. A subscriber gets the message and "voxelizes" the trajectory as shown in the pipeline below:
+
+** I need to add a figure here describing the pipeline **
+
+In parallel, a thread checks if the structure containing the voxelized trajectory is empty. If not, the voxelized trajectory will be compared against the octomap to search for collision. If a collision is found, the Sentinel notifies the motion controller by sending a std_msgs::PointStamped message to `mob/sentinel/collisions`, informing where and when the collision will happen. 
